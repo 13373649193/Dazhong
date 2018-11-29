@@ -76,9 +76,15 @@ class SeleniumMiddleware(object):
         return cls(timeout=crawler.settings.get('SELENIUM_TIMEOUT'))
 
     def recognize_verify_code(self, url):
+        self.browser.get(url)
+        self.browser.save_screenshot('./verify.jpg')
         imgElement = self.browser.find_element_by_class_name('_image__image___2zgEG')
-        imgElement.screenshot('verify.jpg')
-        image = Image.open('verify.jpg')
+        left = imgElement.location['x']
+        top = imgElement.location['y']
+        elementWidth = imgElement.location['x'] + imgElement.size['width']
+        elementHeight = imgElement.location['y'] + imgElement.size['height']
+        image = Image.open('./verify.jpg')
+        image = image.crop((left, top, elementWidth, elementHeight))
         image = image.convert('L')
         threshold = 127
         table = []
